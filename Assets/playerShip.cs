@@ -10,42 +10,49 @@ public class playerShip : MonoBehaviour
     float moveSpeed;
     [SerializeField] bool invertedVertical;
     [SerializeField] int verticalMult;
+    [SerializeField] Transform arrowT;
+    [SerializeField] Gradient red, purple;
     // Start is called before the first frame update
     void Start()
     {
-        print(transform.rotation.x);
+        //print(transform.rotation.x);
         isInverted();
+        var arrLine = GetComponentInChildren<LineRenderer>();
+        print(arrLine.colorGradient);
+        arrowT = arrLine.transform;
+        arrowT.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
         if (invertedVertical) { verticalMult = -1; } else { verticalMult = 1; }
-        transform.Translate(new Vector3(Input.GetAxisRaw("Horizontal"),
+        transform.Translate(new Vector3(Input.GetAxisRaw("Horizontal")* verticalMult,
         Input.GetAxisRaw("Vertical") * verticalMult).normalized * Time.deltaTime * moveSpeed);
-        if (Input.GetKeyDown(KeyCode.Mouse0) && Balls > 0)
+        if (Input.GetKeyDown(KeyCode.Mouse0)) { arrowT.gameObject.SetActive(true); }
+        if (Input.GetKey(KeyCode.Mouse0))
         {
-            Fire();//punto pantalla (angulo?)
+            Point();//punto pantalla (angulo?) <- point
+        }
+        if (Input.GetKeyUp(KeyCode.Mouse0)) { 
+            if (Balls > 0) { /*shoot*/}
+            arrowT.gameObject.SetActive(false);
         }
     }
 
     void isInverted() 
     {
-        if (Mathf.Abs(transform.rotation.x) == 1) { invertedVertical = true; }
-        else if(transform.rotation.x == 0) { invertedVertical = false; }
+        if (Mathf.Abs(transform.rotation.z) == 1) { invertedVertical = true; }
+        else if(transform.rotation.z == 0) { invertedVertical = false; }
     }
 
-    void Fire() 
+    void Point() 
     {
-        //print(Vector2.Angle(new Vector2(transform.position.x,transform.position.y), new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y)));
         Vector3 dir3 =  Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         Vector2 dir = new Vector2(dir3.x, dir3.y).normalized;
-        print("old" + dir);
-        float ang = Vector2.Angle(transform.up, dir);
-        //print(ang);
-        if (ang > 60) { ang = 60; }
-        Vector2 nudir = new Vector2(Mathf.Sign(dir.x) * Mathf.Sin(ang*Mathf.Deg2Rad),Mathf.Sign(transform.up.y) * Mathf.Cos(ang*Mathf.Deg2Rad));
-        print("new" + nudir);
+        float ang= Vector2.SignedAngle(Vector2.up, dir);
+        print(ang + "<-old");
+        arrowT.rotation = Quaternion.Euler(0f, 0f, ang);
     }
     
 }
