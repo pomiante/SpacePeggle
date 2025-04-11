@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Gutter
+  - Top
+  - Canica
   layers:
   - Default
   - TransparentFX

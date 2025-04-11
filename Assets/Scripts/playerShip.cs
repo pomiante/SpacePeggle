@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class playerShip : MonoBehaviour
 {
-    [SerializeField]
-    int Balls;
+    internal int Balls;
     [SerializeField]
     float moveSpeed, coolTime;
     [SerializeField] bool invertedVertical, onCooldown, noBalls, canShoot;
@@ -15,11 +15,14 @@ public class playerShip : MonoBehaviour
     [SerializeField] BallManager ballManager;
     [SerializeField] float angle;
     [SerializeField] LineRenderer lr;
+    Rigidbody2D rb;
+    internal int healthPoints=3;
     // Start is called before the first frame update
     void Start()
     {
         //print(transform.rotation.x);
         isInverted();
+        rb = GetComponent<Rigidbody2D>();
         lr = GetComponentInChildren<LineRenderer>();
         print(lr.colorGradient);
         arrowT = lr.transform;
@@ -32,8 +35,8 @@ public class playerShip : MonoBehaviour
     void Update()
     {
         if (invertedVertical) { verticalMult = -1; } else { verticalMult = 1; }
-        transform.Translate(new Vector3(Input.GetAxisRaw("Horizontal")* verticalMult,
-        Input.GetAxisRaw("Vertical") * verticalMult).normalized * Time.deltaTime * moveSpeed);
+        rb.MovePosition(rb.position + new Vector2(Input.GetAxisRaw("Horizontal"),
+        Input.GetAxisRaw("Vertical")).normalized * Time.deltaTime * moveSpeed);
         if (Input.GetKeyDown(KeyCode.Mouse0)) { arrowT.gameObject.SetActive(true); }
         if (Input.GetKey(KeyCode.Mouse0))
         {
@@ -80,5 +83,12 @@ public class playerShip : MonoBehaviour
         lr.colorGradient = red;
         yield return new WaitForSeconds(t);
         UpdateArrow();
+    }
+
+    public IEnumerator GetHit()
+    {
+        healthPoints -= 1;
+        yield return new WaitForSeconds(0.5f);
+        if(healthPoints <= 0) { SceneManager.LoadScene("titleScreen"); }
     }
 }
