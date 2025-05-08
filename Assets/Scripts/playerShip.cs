@@ -43,7 +43,7 @@ public class playerShip : MonoBehaviour
             Point();//punto pantalla (angulo?) <- point
         }
         if (Input.GetKeyUp(KeyCode.Mouse0)) { 
-            if (Balls > 0) { Shoot(); }
+            if (canShoot) { Shoot(); }
             arrowT.gameObject.SetActive(false);
         }
     }
@@ -80,15 +80,29 @@ public class playerShip : MonoBehaviour
     }    
     public IEnumerator Cooldown(float t) { 
         if(t < 0) { t = 0.5f; }
-        lr.colorGradient = red;
+        //lr.colorGradient = red;
+        onCooldown = true;
+        UpdateArrow();
         yield return new WaitForSeconds(t);
+        onCooldown = false;
         UpdateArrow();
     }
 
     public IEnumerator GetHit()
     {
         healthPoints -= 1;
+        print("getting hit");
         yield return new WaitForSeconds(0.5f);
+        print("got hit");
         if(healthPoints <= 0) { SceneManager.LoadScene("titleScreen"); }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.tag == "NMEshoot")
+        {
+            StartCoroutine(GetHit());
+
+        }
     }
 }

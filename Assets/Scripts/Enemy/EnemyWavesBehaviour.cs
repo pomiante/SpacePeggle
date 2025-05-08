@@ -7,15 +7,26 @@ using UnityEngine.SceneManagement;
 public class Wave
 {
     public enum Movement { horizontal, moveNum }
-    public enum Shooting { straight, shootNum }
+    public enum Shooting { straight, pointed, shootNum }
     public enum Entrance { bottomStraight, enterNum }
-    [SerializeField] internal float delayBefore, delayAfter, timeLimit, rowGap, columnGap;
-    [SerializeField] internal int rowNum, shipsXRow, healthPoints;
-    [SerializeField] internal Movement movePattern;
-    [SerializeField] internal Shooting shootPattern;
-    [SerializeField] internal Entrance enterType;
-    [SerializeField] internal bool smartRow /*o adapt Rows*/;
+    [SerializeField] internal float delayBefore, delayAfter, timeLimit, rowGap/*, columnGap*/;
+    //[SerializeField] internal int rowNum, shipsXRow, healthPoints;
+    [SerializeField] internal List<Row> rows;
+    //[SerializeField] internal Movement movePattern;
+    //[SerializeField] internal Shooting shootPattern;
+    //[SerializeField] internal Entrance enterType;
+    //[SerializeField] internal bool smartRow /*o adapt Rows*/;
     [SerializeField] internal Vector2 waveCenterPosition;
+}
+[System.Serializable]
+public class Row
+{
+    [SerializeField] internal float columnGap, projSpeed;
+    [SerializeField] internal int shipsNum, healthPoints;
+    [SerializeField] internal Wave.Movement movePattern;
+    [SerializeField] internal Wave.Shooting shootPattern;
+    [SerializeField] internal Wave.Entrance enterType;
+    [SerializeField] internal bool smartDistancing /*o adapt Rows*/;
 }
 public class EnemyWavesBehaviour : MonoBehaviour
 {
@@ -35,7 +46,7 @@ public class EnemyWavesBehaviour : MonoBehaviour
         shipLibreList = new List<EnemyShipBehaviour>();
         curRows = new List<EnemyRowBehaviour>();
         rowLibreList = new List<EnemyRowBehaviour>();
-        working = waves.Count > 0;
+        working = waves.Count > 0 && waves[0].rows.Count > 0;
         for (int i = 0; i < maxShips; i++)
         {
             EnemyShipBehaviour thisShip = Instantiate(enemyShip);
@@ -87,14 +98,15 @@ public class EnemyWavesBehaviour : MonoBehaviour
     }
     void SetupWave()
     {
-        for (int i = 0; i < current.rowNum; i++) {
+        for (int i = 0; i < current.rows.Count; i++) {
             EnemyRowBehaviour thisRow = rowLibreList[0];
             thisRow.gameObject.SetActive(true);
             curRows.Add(thisRow);
             rowLibreList.Remove(thisRow);
             thisRow.transform.SetParent(transform);
-            thisRow.Setup(current.enterType, current.movePattern, current.shootPattern, current.shipsXRow,
-                            current.columnGap, current.waveCenterPosition + new Vector2(0,-current.rowGap * current.rowNum/2 + current.rowGap * i));
+            /*thisRow.Setup(current.enterType, current.movePattern, current.shootPattern, current.shipsXRow,
+                            current.columnGap, current.waveCenterPosition + new Vector2(0,-current.rowGap * current.rowNum/2 + current.rowGap * i));*/
+            thisRow.Setup(current.rows[i], current.waveCenterPosition + new Vector2(0, -current.rowGap * current.rows.Count / 2 + current.rowGap * i));
         }
 
     }

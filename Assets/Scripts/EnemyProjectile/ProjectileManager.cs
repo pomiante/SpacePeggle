@@ -25,13 +25,13 @@ public class ProjectileManager : MonoBehaviour
         
     }
 
-    public void Shoot(Wave.Shooting s, Vector3 pos, int ys)
+    public void Shoot(Wave.Shooting s, Vector3 pos, int ys, float ps)
     {
         ProjectileBehaviour thisProj = ProjLibre[0];
         ProjLibre.Remove(thisProj);
         ProjBusy.Add(thisProj);
         thisProj.gameObject.SetActive(true);
-        thisProj.Setup(s,pos,ys);
+        thisProj.Setup(s,pos,ys, ps);
     }
 
     public void Gather(ProjectileBehaviour p)

@@ -42,7 +42,7 @@ public class EnemyRowBehaviour : MonoBehaviour
         }
     }
 
-    public void Setup(Wave.Entrance e, Wave.Movement m, Wave.Shooting s, int numShips, float cg, Vector2 coord)
+    /*public void Setup(Wave.Entrance e, Wave.Movement m, Wave.Shooting s, int numShips, float cg, Vector2 coord)
     {
         active = false;
         shot = s; move = m; enter = e;
@@ -65,6 +65,33 @@ public class EnemyRowBehaviour : MonoBehaviour
             ships.Add(thisShip);
             thisShip.transform.SetParent(transform);
             thisShip.Setup(s, new Vector2(coord.x + i * cg - numShips * cg /2, coord.y));
+        }
+        active = true;
+    }*/
+
+    public void Setup(Row r, Vector2 coord)
+    {
+        active = false;
+        shot = r.shootPattern; move = r.movePattern; enter = r.enterType;
+        columnGap = r.columnGap;
+        moveTo = coord;
+        transform.Translate(coord.x, coord.y, 0); //cambiar en el futuro
+        xSign = 0;
+        while (xSign == 0) { xSign = Random.Range(-1, 2); }
+        leftMost = -1 * columnGap * r.shipsNum / 2;
+        rightMost = columnGap * r.shipsNum / 2;
+        for (int i = 0; i < r.shipsNum; i++)
+        {
+            if (waves == null) { print("shit"); }
+            else if (waves.shipLibreList == null) { print("fuck"); }
+            else if (waves.shipLibreList.Count == 0) { print("what"); }
+            else if (waves.shipLibreList[0] == null) { print("really what"); }
+            EnemyShipBehaviour thisShip = waves.shipLibreList[0];
+            thisShip.gameObject.SetActive(true);
+            waves.shipLibreList.Remove(thisShip);
+            ships.Add(thisShip);
+            thisShip.transform.SetParent(transform);
+            thisShip.Setup(shot, new Vector2(coord.x + i * columnGap - r.shipsNum * columnGap / 2, coord.y), r.projSpeed);
         }
         active = true;
     }
